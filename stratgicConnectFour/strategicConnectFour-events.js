@@ -8,7 +8,11 @@ var squares = [],
     ai1Mode,
     ai2Mode,
     isOtherAiSet,
-    gameIsOver;
+    gameIsOver
+    thisDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')),
+    redImageSrc = "file://" + thisDir + "/redPiece.jpg",
+    yellowImageSrc = "file://" + thisDir + "/yellowPiece.jpg",
+    blockerImageSrc = "file://" + thisDir + "/blackPiece.jpg";
     
 startNewGame = function() {
     var redsGamePiece = document.getElementById("redPiece"),
@@ -174,8 +178,7 @@ function set(ev) {
         column = this.j,
         rowIsFull = document.getElementById("cell" + "0" + column).piecePlaced == true,
         droppedImageSrc = ev.dataTransfer.getData("text"),
-        thisDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')),
-        isBlockerPiece = (droppedImageSrc == "file://" + thisDir + "/blackPiece.jpg"),
+        isBlockerPiece = (droppedImageSrc == blockerImageSrc),
         waitToAlertWinTime = 526;
         
     if(rowIsFull) {
@@ -274,10 +277,8 @@ function aiDefensive(aiMoveSpeed) {
         var opponentsPieceType = turn === 'Red' ? 'Yellow' : 'Red'
             immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
             isBlockerPiece = false,
-            droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
+            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
             waitToAlertEndGameTime = aiMoveSpeed + 1;
-            
-            alert(droppedImageSrc);
         
         if(immediateDefensiveMoveLocation.length != 0){
             moveOption = Math.floor(immediateDefensiveMoveLocation.length * Math.random());
@@ -310,7 +311,7 @@ function aiSimpleComplete(aiMoveSpeed) {
             immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
             immediateOffensiveMoveLocation = immediateOffensiveMove(opponentsPieceType),
             isBlockerPiece = false,
-            droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
+            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
             waitToAlertEndGameTime = aiMoveSpeed + 1;
         
         if(immediateDefensiveMoveLocation.length != 0){
@@ -342,7 +343,7 @@ function aiSimpleComplete(aiMoveSpeed) {
 }
 
 function placePieceRandomly(isBlockerPiece, aiMoveSpeed){
-    var droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
+    var droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
         waitToAlertEndGameTime = aiMoveSpeed + 1;
     
     if(isBlockerPiece) { 
