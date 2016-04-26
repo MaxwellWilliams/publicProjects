@@ -17,6 +17,7 @@ startNewGame = function() {
         yellowsGamePiece = document.getElementById("yellowPiece"),
         yellowsblockerPieces = document.getElementById("yellowsBlockerPiecesDiv"),
         collectBlockerPieceButton = document.getElementById("collectBlockerPieceButton");
+    
     globalRow = 0;
     globalColumn = 0;
     turn = 'Red';
@@ -273,10 +274,10 @@ function aiDefensive(aiMoveSpeed) {
         var opponentsPieceType = turn === 'Red' ? 'Yellow' : 'Red'
             immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
             isBlockerPiece = false,
-            redImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/redPiece.jpg",
-            yellowImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/yellowPiece.jpg",
-            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
+            droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
             waitToAlertEndGameTime = aiMoveSpeed + 1;
+            
+            alert(droppedImageSrc);
         
         if(immediateDefensiveMoveLocation.length != 0){
             moveOption = Math.floor(immediateDefensiveMoveLocation.length * Math.random());
@@ -309,9 +310,7 @@ function aiSimpleComplete(aiMoveSpeed) {
             immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
             immediateOffensiveMoveLocation = immediateOffensiveMove(opponentsPieceType),
             isBlockerPiece = false,
-            redImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/redPiece.jpg",
-            yellowImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/yellowPiece.jpg",
-            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
+            droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
             waitToAlertEndGameTime = aiMoveSpeed + 1;
         
         if(immediateDefensiveMoveLocation.length != 0){
@@ -343,10 +342,7 @@ function aiSimpleComplete(aiMoveSpeed) {
 }
 
 function placePieceRandomly(isBlockerPiece, aiMoveSpeed){
-    var redImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/redPiece.jpg",
-        yellowImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/yellowPiece.jpg",
-        blockerImageSrc = "file:///C:/Users/Max/Desktop/LMU%20Work/2015-2016/Semester%202/Game%20Design/Strategic%20Connect%20Four/HTML%20Prototype/blackPiece.jpg",
-        droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
+    var droppedImageSrc = turn === 'Red' ? document.getElementById("redPiece").src : document.getElementById("yellowPiece").src,
         waitToAlertEndGameTime = aiMoveSpeed + 1;
     
     if(isBlockerPiece) { 
