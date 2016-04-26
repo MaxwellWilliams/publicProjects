@@ -1,0 +1,55 @@
+#title {
+    width:100%;
+    text-align:center;
+}
+#container {
+    width:100%;
+    text-align:center;
+}
+#chooseGameMode{
+}
+#chooseAi1Mode{
+    text-align:center;
+    background-color: #808080;
+    opacity: 0.40;
+}
+#chooseAi2Mode{
+    text-align:center;
+    background-color: #808080;
+    opacity: 0.40;
+}
+#redPlayer{
+    width:20%;
+    text-align:center;
+    float:left;
+    background-color: #808080;
+    opacity: 0.40;
+}
+#redPiece {
+    draggable: false;
+    /*visibility:visible;*/
+}
+#table {
+    width:60%;
+    display:inline-block;
+    text-align:center;
+    margin-left:auto;
+    margin-right:auto;
+    background-color: #808080;
+    opacity: 0.40;
+}
+#yellowPlayer {
+    width:20%;
+    text-align:center;
+    float:right;
+    background-color: #808080;
+    opacity: 0.40;
+}
+#yellowPiece {
+    draggable: false;
+    /*visibility:hidden;*/
+}
+#footer{
+    background-color: #808080;
+    opacity: 0.40;
+}
