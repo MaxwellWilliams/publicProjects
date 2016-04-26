@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Strategic Connect Four</title>
+        <script src="strategicConnectFour-events.js"></script>
+        <link rel="stylesheet" type="text/css" href="strategicConnectFour.css">
+        <style type="text/css">
+            table { border: outset 1px rgb(128, 128, 128) }
+            td {
+                width: 50px; height: 50px;
+                vertical-align: middle;
+                border: inset 1px rgb(128, 128, 128)
+            }
+            tr { text-align: center }
+        </style>
+        <script>
+            function allowDrop(ev) {
+                ev.preventDefault();
+            }
+
+            function drag(ev) {
+                ev.dataTransfer.setData("text", ev.target.src);
+            }
+
+            function drop(ev) {
+                ev.preventDefault();
+                //var data = ev.dataTransfer.getData("text");
+                //ev.target.appendChild.nodeValue(document.getElementById(data));
+            }
+        </script>
+        
+    </head>
+        <body>
+        <div id="title">
+            <h1>Strategic Connect Four</h1>
+            <h4>Created by Max Williams</h4>
+        <div>
+        <br>
+        <div id ="container">
+            <div id="chooseGameMode">
+            <b style="display:inline">Game Mode:</b>&nbsp;
+                <input id="playerVplayer" type="button" value="Player vs. Player" onClick="setGameMode(0)" />
+                <input id="playerVai" type="button" value="Player vs. AI" onClick="setGameMode(1)" />
+                <input id="aiVai" type="button" value="AI vs. AI" onClick="setGameMode(2)" /><br><br><br>
+            </div>
+            
+            <div id="chooseAi1Mode">
+                <b style="display:inline">Red AI Mode:</b>&nbsp;
+                <input id="ai1Random" type="button" value="Random" disabled onClick="setAi1Mode(0)"/>
+                <input id="ai1Defensive" type="button" value="Defensive" disabled onClick="setAi1Mode(1)" />
+                <input id="ai1Offensive" type="button" value="Defensive and Offensive" disabled onClick="setAi1Mode(2)" /><br><br>
+            </div>
+            
+            <div id="chooseAi2Mode">
+                <b style="display:inline">Yellow AI Mode:</b>&nbsp;
+                <input id="ai2Random" type="button" value="Random" disabled onClick="setAi2Mode(0)" />
+                <input id="ai2Defensive" type="button" value="Defensive" disabled onClick="setAi2Mode(1)" />
+                <input id="ai2Offensive" type="button" value="Defensive and Offensive" disabled onClick="setAi2Mode(2)" /><br><br>
+            </div>
+            
+            <div id="redPlayer">
+                <h4>Red</h4>
+                <img src="redPiece.jpg" id="redPiece" alt="redPiece" draggable="true" ondragstart="drag(event)" height="42" width="42">
+                <br> <!-- <input id="player1BlackButton" type="button" value="Place - (Black Piece)" onClick="" /> -->
+                <div id="redsBlockerPiecesDiv"></div>
+            </div>
+            <div id ="table">
+                <table>
+                    <tr>
+                        <td id="cell00" ondragover="allowDrop(event)"></td>
+                        <td id="cell01" ondragover="allowDrop(event)"></td>
+                        <td id="cell02" ondragover="allowDrop(event)"></td>
+                        <td id="cell03" ondragover="allowDrop(event)"></td>
+                        <td id="cell04" ondragover="allowDrop(event)"></td>
+                        <td id="cell05" ondragover="allowDrop(event)"></td>
+                        <td id="cell06" ondragover="allowDrop(event)"></td>
+                        <td id="cell07" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell10" ondragover="allowDrop(event)"></td>
+                        <td id="cell11" ondragover="allowDrop(event)"></td>
+                        <td id="cell12" ondragover="allowDrop(event)"></td>
+                        <td id="cell13" ondragover="allowDrop(event)"></td>
+                        <td id="cell14" ondragover="allowDrop(event)"></td>
+                        <td id="cell15" ondragover="allowDrop(event)"></td>
+                        <td id="cell16" ondragover="allowDrop(event)"></td>
+                        <td id="cell17" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell20" ondragover="allowDrop(event)"></td>
+                        <td id="cell21" ondragover="allowDrop(event)"></td>
+                        <td id="cell22" ondragover="allowDrop(event)"></td>
+                        <td id="cell23" ondragover="allowDrop(event)"></td>
+                        <td id="cell24" ondragover="allowDrop(event)"></td>
+                        <td id="cell25" ondragover="allowDrop(event)"></td>
+                        <td id="cell26" ondragover="allowDrop(event)"></td>
+                        <td id="cell27" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell30" ondragover="allowDrop(event)"></td>
+                        <td id="cell31" ondragover="allowDrop(event)"></td>
+                        <td id="cell32" ondragover="allowDrop(event)"></td>
+                        <td id="cell33" ondragover="allowDrop(event)"></td>
+                        <td id="cell34" ondragover="allowDrop(event)"></td>
+                        <td id="cell35" ondragover="allowDrop(event)"></td>
+                        <td id="cell36" ondragover="allowDrop(event)"></td>
+                        <td id="cell37" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell40" ondragover="allowDrop(event)"></td>
+                        <td id="cell41" ondragover="allowDrop(event)"></td>
+                        <td id="cell42" ondragover="allowDrop(event)"></td>
+                        <td id="cell43" ondragover="allowDrop(event)"></td>
+                        <td id="cell44" ondragover="allowDrop(event)"></td>
+                        <td id="cell45" ondragover="allowDrop(event)"></td>
+                        <td id="cell46" ondragover="allowDrop(event)"></td>
+                        <td id="cell47" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell50" ondragover="allowDrop(event)"></td>
+                        <td id="cell51" ondragover="allowDrop(event)"></td>
+                        <td id="cell52" ondragover="allowDrop(event)"></td>
+                        <td id="cell53" ondragover="allowDrop(event)"></td>
+                        <td id="cell54" ondragover="allowDrop(event)"></td>
+                        <td id="cell55" ondragover="allowDrop(event)"></td>
+                        <td id="cell56" ondragover="allowDrop(event)"></td>
+                        <td id="cell57" ondragover="allowDrop(event)"></td>
+                    </tr>
+                    <tr>
+                        <td id="cell60" ondragover="allowDrop(event)"></td>
+                        <td id="cell61" ondragover="allowDrop(event)"></td>
+                        <td id="cell62" ondragover="allowDrop(event)"></td>
+                        <td id="cell63" ondragover="allowDrop(event)"></td>
+                        <td id="cell64" ondragover="allowDrop(event)"></td>
+                        <td id="cell65" ondragover="allowDrop(event)"></td>
+                        <td id="cell66" ondragover="allowDrop(event)"></td>
+                        <td id="cell67" ondragover="allowDrop(event)"></td>
+                    </tr>
+                </table>
+            </div>
+            <div id ="yellowPlayer">
+                <h4>Yellow</h4>
+                <img src="yellowPiece.jpg" id="yellowPiece" alt="yellowPiece" draggable="false" ondragstart="drag(event)" height="42" width="42">
+                <br> <!-- <input id="player2BlackButton" type="button" value="Place - (Black Piece)" onClick="" /> -->
+                <div id="yellowsBlockerPiecesDiv"></div>
+            </div>
+        </div>
+        <div id="footer">
+            <br><input id="collectBlockerPieceButton" type="button" value="Collect a Black Piece" onClick="collectBlockerPiece()" />
+        </div>
+    </body>
+</html>
