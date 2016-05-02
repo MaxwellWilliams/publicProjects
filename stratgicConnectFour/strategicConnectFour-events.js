@@ -174,22 +174,25 @@ function setupTable(enable) {
 
 function set(ev) {
     ev.preventDefault();
-    var row = this.i,
-        column = this.j,
-        rowIsFull = document.getElementById("cell" + "0" + column).piecePlaced == true,
-        droppedImageSrc = ev.dataTransfer.getData("text"),
-        isBlockerPiece = (droppedImageSrc == blockerImageSrc),
-        waitToAlertWinTime = 526;
-        
-    if(rowIsFull) {
-        alert("This column already is full!"); 
-    } else {
-        row = findRow(column);
-        placePiece(row, column, droppedImageSrc, isBlockerPiece, waitToAlertWinTime);
-        if(isBlockerPiece) {
-            removeBlockerPiece();
-        } else if(!gameIsOver) {
-            changePlayers();
+    
+    if(ev.dataTransfer.getData("text") == redImageSrc || ev.dataTransfer.getData("text") == yellowImageSrc || ev.dataTransfer.getData("text") == blockerImageSrc) {
+        var row = this.i,
+            column = this.j,
+            rowIsFull = document.getElementById("cell" + "0" + column).piecePlaced == true,
+            droppedImageSrc = ev.dataTransfer.getData("text"),
+            isBlockerPiece = (droppedImageSrc == blockerImageSrc),
+            waitToAlertWinTime = 526;
+            
+        if(rowIsFull) {
+            alert("This column already is full!"); 
+        } else {
+            row = findRow(column);
+            placePiece(row, column, droppedImageSrc, isBlockerPiece, waitToAlertWinTime);
+            if(isBlockerPiece) {
+                removeBlockerPiece();
+            } else if(!gameIsOver) {
+                changePlayers();
+            }
         }
     }
 }
@@ -210,145 +213,174 @@ function playerVSai() {
 }
 
 function aiVSai() {
-    var aiMoveSpeed = 1000;          // Must be at least 526 to ensure proper order of execution (of other functions).
+    var aiTurnSpeed = 2200,              // Must be at least 526 to ensure proper order of execution (of other functions).
+        aiMoveSpeed = aiTurnSpeed / 4;   // Must be 1/4 of turn to allow for a maximum of 4 possible moves to occur each turn.
     
-    if(turn == 'Red'){
-        if(ai1Mode == 0){
-            aiRandom(aiMoveSpeed);
-        } else if(ai1Mode == 1) {
-            aiDefensive(aiMoveSpeed);
-        } else if(ai1Mode == 2) {
-            aiSimpleComplete(aiMoveSpeed);
-        }
-    } else if(turn == 'Yellow') {
-        if(ai2Mode == 0) {
-            aiRandom(aiMoveSpeed);
-        } else if(ai2Mode == 1) {
-            aiDefensive(aiMoveSpeed);
-        } else if(ai2Mode == 2) {
-            aiSimpleComplete(aiMoveSpeed);
-        }
+    if(ai1Mode == 0){
+        aiRandom(aiMoveSpeed);
+    } else if(ai1Mode == 1) {
+        aiDefensive(aiMoveSpeed);
+    } else if(ai1Mode == 2) {
+        aiSimpleComplete(aiMoveSpeed);
     }
     
     setTimeout(function(){
         if(!gameIsOver){
             aiVSai();  
         }
-    }, aiMoveSpeed);
+    }, aiTurnSpeed);
 }
 
 function aiRandom(aiMoveSpeed, recursive = false) {
     if(!gameIsOver){
-        var moveOptions = 2,
-            moveChoice,
+        var moveOptions = 2;
             currentPlayersBlockerPiecesDiv = turn === 'Red' ? document.getElementById("redsBlockerPiecesDiv") : document.getElementById("yellowsBlockerPiecesDiv"),
-            currentPlayersBlockerPieces = currentPlayersBlockerPiecesDiv.children;
+            currentPlayersBlockerPiecesLength = currentPlayersBlockerPiecesDiv.children.length;
         
-        if(currentPlayersBlockerPieces.length > 0) {
-            //alert(turn === 'Red' ? "redsBlockerPiecesDiv" : "yellowsBlockerPiecesDiv");
+        if(currentPlayersBlockerPiecesLength > 0){
             moveOptions = 3;
         }
         
         moveChoice = Math.floor(moveOptions * Math.random());
         
-        while(recursive && moveChoice == 1) {
+        while(((currentPlayersBlockerPiecesLength >= 6) || recursive) && moveChoice == 1) {
             moveChoice = Math.floor(moveOptions * Math.random());
         }
         
-        //alert("moveChoice = "  + moveChoice);
-        
         if(moveChoice == 0) {
-            placePieceRandomly(false, aiMoveSpeed);
-        } else if(moveChoice == 1){
-            collectBlockerPiece();
-        } else if(moveChoice == 2){
-            placePieceRandomly(true, aiMoveSpeed);
             window.setTimeout(function(){
+                placePieceRandomly(false, aiMoveSpeed);
+                //alert("End of turn.")
+            }, aiMoveSpeed)
+        } else if(moveChoice == 1){
+            window.setTimeout(function(){
+                collectBlockerPiece();
+                //alert("End of turn.")
+            }, aiMoveSpeed);
+        } else if(moveChoice == 2){
+            window.setTimeout(function(){
+                placePieceRandomly(true, aiMoveSpeed);
                 aiRandom(aiMoveSpeed, true);
-            }, aiMoveSpeed + 2);
-            
+            }, aiMoveSpeed);
         }
-
     }
+    
 }
 
 function aiDefensive(aiMoveSpeed) {
     if(!gameIsOver){
-        var opponentsPieceType = turn === 'Red' ? 'Yellow' : 'Red'
-            immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
-            isBlockerPiece = false,
-            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
-            waitToAlertEndGameTime = aiMoveSpeed + 1;
+        var currentPlayersBlockerPiecesDiv = turn === 'Red' ? document.getElementById("redsBlockerPiecesDiv") : document.getElementById("yellowsBlockerPiecesDiv"),
+            currentPlayersBlockerPiecesLength = currentPlayersBlockerPiecesDiv.children.length / 2,
+            opponentsBlockerPiecesDiv = turn === 'Red' ? document.getElementById("yellowsBlockerPiecesDiv") : document.getElementById("redsBlockerPiecesDiv"),
+            opponentsBlockerPiecesLength = opponentsBlockerPiecesDiv.children.length / 2,
+            largestDefensiveMove = (currentPlayersBlockerPiecesLength + 1) < (opponentsBlockerPiecesLength + 2) ? (currentPlayersBlockerPiecesLength + 1) : (opponentsBlockerPiecesLength + 2),
+            placedPiece = false,
+            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc;
+            
+        //alert(largestDefensiveMove);
         
-        if(immediateDefensiveMoveLocation.length != 0){
-            moveOption = Math.floor(immediateDefensiveMoveLocation.length * Math.random());
-            column = immediateDefensiveMoveLocation[moveOption];
-            //alert(column)
-        } else {
-            do {
-                column = Math.floor(8 * Math.random());
-            } while(document.getElementById("cell" + "0" + column).piecePlaced == true);
+        for(var moveSize = 1; moveSize <= largestDefensiveMove; moveSize += 1) {
+            var immediateDefensiveMoveLocation = getImmediateDevensiveMoves(moveSize);
+            //alert("Possible Immediate Defensive moves: " + immediateDefensiveMoveLocation.toString());
+        
+            if(immediateDefensiveMoveLocation.length > 0 && !placedPiece){
+                var moveOption = Math.floor(immediateDefensiveMoveLocation.length * Math.random()),
+                    column = immediateDefensiveMoveLocation[moveOption];
+                    
+                for(var move = 1; move <= moveSize; move += 1) {
+                    placedPiece = true;
+                    
+                    window.setTimeout(function(){
+                        var row = findRow(column);
+                        currentPlayersBlockerPiecesLength = currentPlayersBlockerPiecesDiv.children.length / 2;
+                    
+                        if(currentPlayersBlockerPiecesLength > 0) {
+                            placePiece(row, column, blockerImageSrc, true, aiMoveSpeed);
+                            removeBlockerPiece();
+                            
+                        } else {
+                            //alert("Here!");
+                            
+                            placePiece(row, column, droppedImageSrc, false, aiMoveSpeed);
+                            
+                            if(!gameIsOver){
+                                changePlayers();
+                            }
+                        }
+                    }, aiMoveSpeed * move);
+                }
+            }
         }
-        
-        row = findRow(column);
-        placePiece(row, column, droppedImageSrc, isBlockerPiece, waitToAlertEndGameTime);
-        if(isBlockerPiece) {
-            removeBlockerPiece();
-        } else if(!gameIsOver){
-            changePlayers();
-        }
-        
-        globalRow = row;
-        globalColumn = column;
-        
+
+        if(!placedPiece && getImmediateDevensiveMoves(currentPlayersBlockerPiecesLength + 2).length > 0 && currentPlayersBlockerPiecesLength <= 6){
+            window.setTimeout(function(){
+                //alert("Defensively collecting blocker piece.");
+                collectBlockerPiece();
+            }, aiMoveSpeed);
+        } else if(!placedPiece) {
+            //alert("Random move");
+            aiRandom(aiMoveSpeed, false);
+        }  
     }
 }
 
 
 function aiSimpleComplete(aiMoveSpeed) {
     if(!gameIsOver){
-        var opponentsPieceType = turn === 'Red' ? 'Yellow' : 'Red'
-            immediateDefensiveMoveLocation = immediateDevensiveMove(opponentsPieceType),
-            immediateOffensiveMoveLocation = immediateOffensiveMove(opponentsPieceType),
-            isBlockerPiece = false,
-            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
-            waitToAlertEndGameTime = aiMoveSpeed + 1;
+        var currentPlayersBlockerPiecesDiv = turn === 'Red' ? document.getElementById("redsBlockerPiecesDiv") : document.getElementById("yellowsBlockerPiecesDiv"),
+            currentPlayersBlockerPiecesLength = currentPlayersBlockerPiecesDiv.children.length / 2,
+            opponentsBlockerPiecesDiv = turn === 'Red' ? document.getElementById("yellowsBlockerPiecesDiv") : document.getElementById("redsBlockerPiecesDiv"),
+            opponentsBlockerPiecesLength = opponentsBlockerPiecesDiv.children.length / 2,
+            largetsOffensiveMove = currentPlayersBlockerPiecesLength + 1,
+            largestDefensiveMove = (currentPlayersBlockerPiecesLength + 1) < (opponentsBlockerPiecesLength + 2) ? (currentPlayersBlockerPiecesLength + 1) : (opponentsBlockerPiecesLength + 2),
+            placedPiece = false,
+            droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc;
         
-        if(immediateDefensiveMoveLocation.length != 0){
-            moveOption = Math.floor(immediateDefensiveMoveLocation.length * Math.random());
-            column = immediateDefensiveMoveLocation[moveOption];
-            //alert(column)
-        } else if(immediateOffensiveMoveLocation.length != 0) {
-            moveOption = Math.floor(immediateOffensiveMoveLocation.length * Math.random());
-            column = immediateOffensiveMoveLocation[moveOption];
-            //alert(column)
-        } else {
-            do {
-                column = Math.floor(8 * Math.random());
-            } while(document.getElementById("cell" + "0" + column).piecePlaced == true);
+        
+        for(var moveSize = 1; moveSize <= largetsOffensiveMove; moveSize += 1) {
+            var immediateOffensiveMoveLocations = getImmediateOffensiveMoves(moveSize);
+            //alert("Possible Immediate Defensive moves: " + immediateOffensiveMoveLocations.toString());
+        
+            if(immediateOffensiveMoveLocations.length > 0 && !placedPiece){
+                var moveOption = Math.floor(immediateOffensiveMoveLocations.length * Math.random()),
+                    column = immediateOffensiveMoveLocations[moveOption];
+                placedPiece = true;
+                
+                for(var move = 1; move <= moveSize; move += 1) {
+                    window.setTimeout(function(){
+                        var row = findRow(column);
+                        currentPlayersBlockerPiecesLength = currentPlayersBlockerPiecesDiv.children.length / 2;
+                    
+                        if(!(inChcek(row, column, 0, 1, turn) || inChcek(row, column, 1, 0, turn) ||
+                           inChcek(row, column, 1, 1, turn) || inChcek(row, column, 1, - 1, turn))) {
+                            placePiece(row, column, blockerImageSrc, true, aiMoveSpeed);
+                            removeBlockerPiece();
+                            
+                        } else {
+                            //alert("Here!");
+                            
+                            placePiece(row, column, droppedImageSrc, false, aiMoveSpeed);
+                        }
+                    }, aiMoveSpeed * move);
+                }
+            }
         }
-        
-        row = findRow(column);
-        placePiece(row, column, droppedImageSrc, isBlockerPiece, waitToAlertEndGameTime);
-        if(isBlockerPiece) {
-            removeBlockerPiece();
-        } else if(!gameIsOver){
-            changePlayers();
+        if(!placedPiece && getImmediateOffensiveMoves(currentPlayersBlockerPiecesLength + 2).length > 0 && currentPlayersBlockerPiecesLength <= 6){
+            window.setTimeout(function(){
+                //alert("Offensively collecting blocker piece.");
+                collectBlockerPiece();
+            }, aiMoveSpeed);
+        } else if(!placedPiece){
+            aiDefensive(aiMoveSpeed);
         }
-        
-        globalRow = row;
-        globalColumn = column;
-        
     }
 }
 
 function placePieceRandomly(isBlockerPiece, aiMoveSpeed){
     var droppedImageSrc = turn === 'Red' ? redImageSrc : yellowImageSrc,
-        waitToAlertEndGameTime = aiMoveSpeed + 1;
+        waitToAlertEndGameTime = aiMoveSpeed;
     
-    if(isBlockerPiece) { 
-        droppedImageSrc = blockerImageSrc;
-    }
+    droppedImageSrc = isBlockerPiece ? blockerImageSrc : droppedImageSrc;
     
     do {
         column = Math.floor(8 * Math.random());
@@ -356,6 +388,7 @@ function placePieceRandomly(isBlockerPiece, aiMoveSpeed){
     
     row = findRow(column);
     placePiece(row, column, droppedImageSrc, isBlockerPiece, waitToAlertEndGameTime);
+    
     if(isBlockerPiece) {
         removeBlockerPiece();
     } else if(!isBlockerPiece && !gameIsOver){
@@ -426,9 +459,7 @@ function placePiece(row, column, imageSource, isBlockerPiece, waitToAlertEndGame
         moves += 1;
         
     for(var counter = 0; counter <= row; counter+=1) {
-        
         pieceFalling(piece, counter, column);
-        
     }
     
     if(!isBlockerPiece && win(row, column)) {
@@ -438,7 +469,7 @@ function placePiece(row, column, imageSource, isBlockerPiece, waitToAlertEndGame
             startNewGame();
         }, waitToAlertEndGameTime);
     }
-    if(tie()){
+    if(tie() && !gameIsOver){
        gameIsOver = true; 
        window.setTimeout(function(){
             alert("Tie game!");
@@ -477,7 +508,7 @@ function win(row, column) {
 
 function tie() {
     if (moves === 56) {
-        gameIsOver = true;
+        return true;
     } else {
         return false;
     }
@@ -553,14 +584,19 @@ function collectBlockerPiece() {
     changePlayers();
 }
 
-function immediateDevensiveMove(opponentPieceType) {
+function getImmediateDevensiveMoves(piecesUsed) {
     var immediateMoves = [],
         opponentPieceType = turn === 'Red' ? 'Yellow' : 'Red';
     
     for(var column = 0; column < 8; column += 1){
-        var row = findRow(column);
+        var row = findRow(column) - (piecesUsed - 1);
         
-        if(inChcek(row, column, 0, 1, opponentPieceType) || inChcek(row, column, 1, 0, opponentPieceType) || inChcek(row, column, 1, 1, opponentPieceType) || inChcek(row, column, 1, -1, opponentPieceType)) {
+        //if(piecesUsed > 1){
+        //    alert("(" + column + ", " + row + ")");
+        //}
+        
+        if((inChcek(row, column, 0, 1, opponentPieceType) || inChcek(row, column, 1, 0, opponentPieceType) ||
+           inChcek(row, column, 1, 1, opponentPieceType) || inChcek(row, column, 1, -1, opponentPieceType))) {
             immediateMoves.push(column);
         }
     }
@@ -568,47 +604,48 @@ function immediateDevensiveMove(opponentPieceType) {
     return immediateMoves;
 }
 
-function immediateOffensiveMove(opponentsPieceType) {
+function getImmediateOffensiveMoves(piecesUsed) {
     var immediateMoves = [],
-        opponentPieceType = turn;
+        playersPieceType = turn;
     
     for(var column = 0; column < 8; column += 1){
-        var row = findRow(column);
+        var row = findRow(column) - (piecesUsed - 1);
         
-        if(inChcek(row, column, 0, 1, opponentPieceType) || inChcek(row, column, 1, 0, opponentPieceType) || inChcek(row, column, 1, 1, opponentPieceType) || inChcek(row, column, 1, -1, opponentPieceType)) {
+        if(inChcek(row, column, 0, 1, playersPieceType) || inChcek(row, column, 1, 0, playersPieceType) ||
+           inChcek(row, column, 1, 1, playersPieceType) || inChcek(row, column, 1, - 1, playersPieceType)) {
             immediateMoves.push(column);
         }
     }
-    //alert("Possible Immediate Defensive moves: " + immediateMoves.toString());
+    //alert("Possible Immediate Offensive moves: " + immediateMoves.toString());
     return immediateMoves;
     
     
 }
 
-function inChcek(row, column, rowIncrement, columnIncrement, opponentPieceType) {
+function inChcek(row, column, rowIncrement, columnIncrement, pieceType) {
     var firstRow = row + rowIncrement,
         secondRow = row - rowIncrement,
         firstColumn = column + columnIncrement,
         secondColumn = column - columnIncrement,
-        isFirstRowValid = firstRow > -1 && firstRow < 7,
-        isSecondRowValid = secondRow > -1 && secondRow < 7,
-        isFirstColumnValid = firstColumn > -1 && firstColumn < 8,
-        isSecondColumnValid = secondColumn > -1 && secondColumn < 8,
-        firstDirectionIsOpponent = false,
-        secondDirectionIsOpponent = false;
+        isFirstRowValid = firstRow >= 0 && firstRow <= 6,
+        isSecondRowValid = secondRow >= 0 && secondRow <= 6,
+        isFirstColumnValid = firstColumn >= 0 && firstColumn <= 7,
+        isSecondColumnValid = secondColumn >= 0 && secondColumn <= 7,
+        firstDirectionIsPieceType = false,
+        secondDirectionIsPieceType = false;
     
     if(isFirstRowValid && isFirstColumnValid){
-        firstDirectionIsOpponent = document.getElementById("cell" + firstRow + firstColumn).pieceType == opponentPieceType;
+        firstDirectionIsPieceType = document.getElementById("cell" + firstRow + firstColumn).pieceType == pieceType;
     }
     if(isSecondRowValid && isSecondColumnValid) {
-        secondDirectionIsOpponent = document.getElementById("cell" + secondRow + secondColumn).pieceType == opponentPieceType;
+        secondDirectionIsPieceType = document.getElementById("cell" + secondRow + secondColumn).pieceType == pieceType;
     }
     
-    if(firstDirectionIsOpponent && checkConnectedPieces(firstRow, firstColumn, rowIncrement, columnIncrement) >= 2){
+    if(firstDirectionIsPieceType && checkConnectedPieces(firstRow, firstColumn, rowIncrement, columnIncrement) >= 2){
         return true;
-    } else if(secondDirectionIsOpponent && checkConnectedPieces(secondRow, secondColumn, - rowIncrement, - columnIncrement) >= 2){
+    } else if(secondDirectionIsPieceType && checkConnectedPieces(secondRow, secondColumn, - rowIncrement, - columnIncrement) >= 2){
         return true;
-    } else if(secondDirectionIsOpponent && firstDirectionIsOpponent && (checkConnectedPieces(firstRow, firstColumn, rowIncrement, columnIncrement) >= 1 || checkConnectedPieces(secondRow, secondColumn, - rowIncrement, - columnIncrement) >= 1)){
+    } else if(secondDirectionIsPieceType && firstDirectionIsPieceType && (checkConnectedPieces(firstRow, firstColumn, rowIncrement, columnIncrement) >= 1 || checkConnectedPieces(secondRow, secondColumn, - rowIncrement, - columnIncrement) >= 1)){
         return true;
     } else {
         return false;
